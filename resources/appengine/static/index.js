@@ -1,3 +1,27 @@
+/*
+ * Copyright (C) 2011 Klokan Technologies GmbH (info@klokantech.com)
+ *
+ * THE COMPLETE SOURCE CODE OF THIS APPLICATION IS AVAILABLE AT:
+ *
+ *                 http://www.webglearth.org/
+ *
+ * The JavaScript code in this page is free software: you can
+ * redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GNU GPL) as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option)
+ * any later version.  The code is distributed WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU GPL for more details.
+ *
+ * USE OF THIS CODE OR ANY PART OF IT IN A NONFREE SOFTWARE IS NOT ALLOWED
+ * WITHOUT PRIOR WRITTEN PERMISSION FROM KLOKAN TECHNOLOGIES GMBH.
+ *
+ * As additional permission under GNU GPL version 3 section 7, you
+ * may distribute non-source (e.g., minimized or compacted) forms of
+ * that code without the copy of the GNU GPL normally required by
+ * section 4, provided you include this license notice and a URL
+ * through which recipients can access the Corresponding Source.
+ */
 function e(a){throw a;}var i=true,j=null,l=false;function aa(){return function(){}}function p(a){return function(){return this[a]}}function q(a){return function(){return a}}var t,u=this;function v(){}function w(a){a.fa=function(){return a.lg||(a.lg=new a)}}
 function ba(a){var b=typeof a;if(b=="object")if(a){if(a instanceof Array||!(a instanceof Object)&&Object.prototype.toString.call(a)=="[object Array]"||typeof a.length=="number"&&typeof a.splice!="undefined"&&typeof a.propertyIsEnumerable!="undefined"&&!a.propertyIsEnumerable("splice"))return"array";if(!(a instanceof Object)&&(Object.prototype.toString.call(a)=="[object Function]"||typeof a.call!="undefined"&&typeof a.propertyIsEnumerable!="undefined"&&!a.propertyIsEnumerable("call")))return"function"}else return"null";
 else if(b=="function"&&typeof a.call=="undefined")return"object";return b}function x(a){return a===j}function y(a){return ba(a)=="array"}function ca(a){var b=ba(a);return b=="array"||b=="object"&&typeof a.length=="number"}function z(a){return typeof a=="string"}function da(a){return typeof a=="number"}function ea(a){return ba(a)=="function"}function fa(a){a=ba(a);return a=="object"||a=="array"||a=="function"}function A(a){return a[ga]||(a[ga]=++ha)}
