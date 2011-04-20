@@ -1,10 +1,10 @@
-#summary Details for accessing the source code of the project
+#summary Source code access via GitHub
 
 = Source Code is now at GitHub! =
 
-[https://github.com/webglearth/webglearth https://github.com/images/modules/header/logov3.png]
+ https://github.com/images/modules/header/logov3.png]
 
-We moved to GitHub! Check out or browse the source code at:
+We moved to [https://github.com/webglearth/webglearth GitHub]! Check out or browse the source code at:
 
 ----
 
@@ -27,7 +27,7 @@ git clone git://github.com/webglearth/webglearth.git
 
 == SVN access ==
 
-If you really need access to the code via SVN, the GitHub provides also SVN gateway, so you can still keep using the editors which supports only SVN:
+If you really need access to the code via SVN, the [https://github.com/webglearth/webglearth GitHub] provides also SVN gateway, so you can still keep using the editors which supports only SVN:
 {{{
 svn checkout https://svn.github.com/webglearth/webglearth
 }}}
