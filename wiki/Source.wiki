@@ -1,0 +1,33 @@
+#summary Details for accessing the source code of the project
+
+= Source Code is now at GitHub! =
+
+[https://github.com/webglearth/webglearth https://github.com/images/modules/header/logov3.png]
+
+We moved to GitHub! Check out or browse the source code at:
+
+----
+
+https://github.com/webglearth/webglearth
+----
+
+= Source checkout =
+
+If you are new to Git please follow the [http://help.github.com/set-up-git-redirect Set Up Git] guide first.
+
+Feel free to [http://help.github.com/fork-a-repo/ fork our repository] and later send a pull request so we can review your code and commit it into the official WebGL Earth code base. We are looking forward to your contribution!
+
+== GIT access ==
+
+If you just want to get the code, then use this command:
+
+{{{
+git clone git://github.com/webglearth/webglearth.git
+}}}
+
+== SVN access ==
+
+If you really need access to the code via SVN, the GitHub provides also SVN gateway, so you can still keep using the editors which supports only SVN:
+{{{
+svn checkout https://svn.github.com/webglearth/webglearth
+}}}
