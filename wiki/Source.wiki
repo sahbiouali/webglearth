@@ -13,7 +13,7 @@ https://github.com/webglearth/webglearth
 
 If you are new to Git please follow the [http://help.github.com/set-up-git-redirect Set Up Git] guide first.
 
-Feel free to [http://help.github.com/fork-a-repo/ fork our repository] and later send a pull request so we can review your code and commit it into the official WebGL Earth code base. We are looking forward to your contribution!
+Feel free to [http://help.github.com/fork-a-repo/ fork our repository] and later send a [http://help.github.com/pull-requests/ pull request] so we can review your code and commit it into the official WebGL Earth code base. We are looking forward to your contribution!
 
 == GIT access ==
 
