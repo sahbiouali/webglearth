@@ -1,7 +1,5 @@
 #summary Source code access via [https://github.com/webglearth/webglearth GitHub]
 
-= Source Code is now at GitHub! =
-
 [https://github.com/webglearth/webglearth https://github.com/images/modules/header/logov3.png]
 
 We moved to [https://github.com/webglearth/webglearth GitHub]! Check out or browse the source code at:
