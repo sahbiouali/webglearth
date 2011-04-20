@@ -6,7 +6,7 @@ We moved to [https://github.com/webglearth/webglearth GitHub]! Check out or brow
 
 ----
 
-https://github.com/webglearth/webglearth
+ * https://github.com/webglearth/webglearth
 ----
 
 = Source checkout =
@@ -15,9 +15,16 @@ If you are new to Git please follow the [http://help.github.com/set-up-git-redir
 
 Feel free to [http://help.github.com/fork-a-repo/ fork our repository] and later send a [http://help.github.com/pull-requests/ pull request] so we can review your code and commit it into the official WebGL Earth code base. We are looking forward to your contribution!
 
+== Direct download ==
+
+The latest version of the WebGL Earth project is always available packed in an archive via GitHub:
+
+ * [https://github.com/webglearth/webglearth/zipball/master webglearth.zip]
+ * [https://github.com/webglearth/webglearth/tarball/master webglearth.tar.gz]
+
 == GIT access ==
 
-If you just want to get the code, then use this command:
+If you just want to get the source code, then use this command:
 
 {{{
 git clone git://github.com/webglearth/webglearth.git
@@ -25,7 +32,7 @@ git clone git://github.com/webglearth/webglearth.git
 
 == SVN access ==
 
-If you really need access to the code via SVN, the [https://github.com/webglearth/webglearth GitHub] provides also SVN gateway, so you can still keep using the editors which supports only SVN:
+Access to the code via SVN is possible via the [https://github.com/webglearth/webglearth GitHub] SVN gateway, so you can use the editors with support for SVN:
 {{{
 svn checkout https://svn.github.com/webglearth/webglearth
 }}}
