@@ -71,6 +71,6 @@ h1{background-repeat:no-repeat;background-position:center center;background-imag
 .goog-control-hover {border-color:#369;color:#369;}
 .goog-control-active,.goog-control-selected,.goog-control-checked {border-color:#9cf;color:#9cf;}
 .goog-control-focused {border-color:orange;}
-#weapp-opacityslider{position:absolute;top:130px;right:30px;}
+#weapp-opacityslider{position:absolute;top:100px;right:30px;}
 #weapp-opacityslider .goog-slider-horizontal{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAOBAMAAAAcbWtvAAAAElBMVEX////////////8/Py1tbWfn58UvkXdAAAABnRSTlMALYCAgEAWxJhEAAAAH0lEQVR4XkXAwQAAAAgEsCGEEMIhhJA/Tc/mlRZjAQ4LDADxoBzNvAAAAABJRU5ErkJggg==);position:relative;height:14px;width:80px;}
 #weapp-opacityslider .goog-slider-thumb{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAOCAYAAAAMn20lAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN1wAADdcBQiibeAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADzSURBVBiVTY0xTgJRGIS/fWIBhYmNx/AKHoDKzit4A6OFpZ0nsLCw8wzWxs4tMBoCwkZQV4Flwz53N/v+scHINJOZL5OJJBE3F4eFkqtJuGsPh4PLWaLz1mu47bbZu6nJOlVZ8dnnbPTIjgMdR9FWJyKiKgPLVMwSDlyg7jZaUbMkzwpmY5i/se8aFZQsKPWN9wU+g6YCZ9QYJYEKs0AIIIEThjBAwL85+MtiU46NQtpYCEMywLAAFtagwRP4Iaik9uDzNfCaznMNWOiJ6bPIUwBWLrf+9dxiRi9fTHrrH3hoFZqefLynu+NYR3nKNnAPnP4C0Q+aKB2imj0AAAAASUVORK5CYII=);position:absolute;width:6px;height:14px;overflow:hidden;}
