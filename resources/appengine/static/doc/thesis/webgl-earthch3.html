@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+>
+<head><title>3 Implementation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" />
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" />
+<!-- xhtml,2,fn-in,html -->
+<meta name="src" content="webgl-earth.tex" />
+<meta name="date" content="2011-09-13 15:42:00" />
+<link rel="stylesheet" type="text/css" href="webgl-earth.css" />
+</head><body
+><!--l. 349--><div class="crosslinks"><p class="noindent">[<a
+href="webgl-earthch4.html" >next</a>] [<a
+href="webgl-earthch2.html" >prev</a>] [<a
+href="webgl-earthch2.html#tailwebgl-earthch2.html" >prev-tail</a>] [<a
+href="#tailwebgl-earthch3.html">tail</a>] [<a
+href="index.html#webgl-earthch3.html" >up</a>] </p></div>
+<h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;3</span><br /><a
+id="x4-150003"></a>Implementation</h2>
+<!--l. 351--><p class="noindent" >The practical result of this thesis is a fully functional open-source project, although
+some parts and features are still in the &#8220;beta&#8221; phase. This chapter introduces
+some of the tools used during the development and describes important
+and/or interesting parts of the implementation at the time of writing this
+thesis.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.1   </span> <a
+id="x4-160003.1"></a>Closure Tools</h3>
+<!--l. 354--><p class="noindent" ><span
+class="cmti-10">Closure Tools </span>is a set of tools designed for efficient JavaScript development. It is
+being actively developed by Google as a base for their large applications such as
+Gmail, Google Maps, or Google Docs. Closure Tools were released as <span
+class="cmti-10">open-source </span>in
+November 2009 and Google is accepting patches since May 2010. The main purpose
+of Closure Tools is to make JavaScript development easier and more efficient by
+keeping the code clean and easy to read. We decided to use Closure Tools for WebGL
+Earth development to make it easy for anyone who would like to join the project in
+the future.
+</p><!--l. 356--><p class="noindent" >
+</p>
+<h4 class="likesubsectionHead"><a
+id="x4-170003.1"></a>Closure Library</h4>
+<!--l. 357--><p class="noindent" >The <span
+class="cmti-10">Closure Library </span>is an object-oriented codebase with modular architecture that
+contains a lot of useful functions and classes for a wide range of web-related tasks
+such as DOM manipulation, WYSIWYG editor or even client&#8211;server communication
+utilities.
+</p><!--l. 359--><p class="indent" >   The library also provides module-dependency and a namespace system or class
+inheritance that can help programmers to achieve consistent project structuring and
+higher maintainability. Because it&#8217;s divided into a lot of small files (modules), the
+best practice is to use Closure Compiler along with the library to minify the
+code.
+</p><!--l. 361--><p class="noindent" >
+</p>
+<h4 class="likesubsectionHead"><a
+id="x4-180003.1"></a>Closure Compiler</h4>
+<!--l. 362--><p class="noindent" >The <span
+class="cmti-10">Closure Compiler </span>is an optimization tool that can be used to &#8220;compile&#8221;
+JavaScript source code into faster and more compact, though behaviorally-equivalent,
+output. It utilizes several different optimization techniques such as function
+inlining, dead code removal, function and property renaming, constant folding,
+etc.
+
+</p><!--l. 364--><p class="noindent" >
+</p>
+<h4 class="likesubsectionHead"><a
+id="x4-190003.1"></a>Closure Linter</h4>
+<!--l. 365--><p class="noindent" >Another important part of Closure Tools is a rather small utility for code style
+checking. When developing a project together with other people, it is often difficult
+to make every contributor follow the same code style guidelines. <span
+class="cmti-10">Closure Linter</span>
+notifies the programmer of the most common violations of good JavaScript coding
+practices<span class="footnote-mark"><a
+href="#fn1x3" id="fn1x3-bk"><sup class="textsuperscript">1</sup></a></span><a
+id="x4-19001f1"></a>
+and is even able to auto-fix most of them.
+</p><!--l. 367--><p class="noindent" >
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.2   </span> <a
+id="x4-200003.2"></a>Project overview</h3>
+<!--l. 368--><p class="noindent" >We utilize Closure Tools to organize the code of WebGL Earth into a number of
+namespaces and modules (figure&#x00A0;<a
+href="#x4-200003.2">3.2<!--tex4ht:ref: fig:module_diagram --></a>).
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-200011"></a>
+
+<div class="center"
+><!--l. 370--><p class="noindent" >
+</p><!--l. 370--><p class="noindent" ><img
+src="webgl-earth8x.png" alt="PIC" class="graphics" width="625.96062pt" height="300.98485pt"  /><!--tex4ht:graphics
+name="webgl-earth8x.png" src="gfx/module_diagram.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;3.1: </span><span
+class="content">Visualization of the most important classes and modules</span></div><!--tex4ht:label?: x4-200011 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 372--><p class="indent" >   The project is divided into three main parts. The namespace <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">we</span></span></span> (<span
+class="cmbx-10">W</span>ebGL <span
+class="cmbx-10">E</span>arth)
+serves as a codebase and provides all of the core functionality for the other two
+namespaces called <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">weapp</span></span></span> and <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">api</span></span></span>. As their names suggest, <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">weapp</span></span></span> represents the
+final application (and additional UI (<span
+class="cmti-10">User Interface</span>) controls) running on
+<a
+href="http://www.webglearth.com/" class="url" ><span
+class="cmtt-10">http://www.webglearth.com/</span></a>, while <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">api</span></span></span> contains an application and exports for
+the <span
+class="cmti-10">WebGL Earth API</span>. If a programmer wants to build his own, complex
+application, the codebase in the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">we</span></span></span> namespace should be used together with
+the Closure Compiler. However, for simple applications that use only the
+most common operations, the API should provide enough functionality and
+can be easily used together with a wide variety of JavaScript libraries and
+compilers.
+</p><!--l. 375--><p class="indent" >   This approach is similar to Google Maps model, where the core codebase is shared
+between the Google Maps application itself (running at <a
+href="http://maps.google.com/" class="url" ><span
+class="cmtt-10">http://maps.google.com/</span></a>)
+and the public JavaScript API.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.3   </span> <a
+id="x4-210003.3"></a>Tile management</h3>
+<!--l. 378--><p class="noindent" >One of the most important parts of WebGL Earth is tile management. All the tiles
+are loaded via the appropriate <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">TileProvider</span></span></span> in the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">we.texturing</span></span></span> namespace. Each
+implementation of this <span
+class="cmti-10">abstract </span>class provides access to tiles of one particular data
+source (<span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">BingTileProvider</span></span></span>, <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">OSMTileProvider</span></span></span>, etc.). Nearly all tile requests are
+directed to an instance of the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">TileCache</span></span></span> class, that serves cached images or requests
+loading of the unavailable ones and callbacks after loading finishes. The
+only exception are tiles for the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">ClipLevelN</span></span></span>, which don&#8217;t need to be cached.
+The tile loading itself is realized by dynamically creating <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">image</span></span></span> element
+(figure&#x00A0;<a
+href="#x4-210092">3.2<!--tex4ht:ref: fig:image_loading --></a>).
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-210092"></a>
+
+<div class="center"
+><!--l. 381--><p class="noindent" >
+</p>
+<!--l. 382-->
+<div class="lstlisting" id="listing-1"><span class="label"><a
+id="x4-21001r1"></a></span>tile.image&#x00A0;=&#x00A0;<span
+class="cmbx-10">new</span>&#x00A0;Image();&#x00A0;<br /><span class="label"><a
+id="x4-21002r2"></a></span>&#x00A0;<br /><span class="label"><a
+id="x4-21003r3"></a></span><span
+class="cmtt-10">//</span><span
+class="cmtt-10">define</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">function</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">to</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">be</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">called</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">after</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">loading</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">finishes</span>&#x00A0;<br /><span class="label"><a
+id="x4-21004r4"></a></span>tile.image.onload&#x00A0;=&#x00A0;...;&#x00A0;<br /><span class="label"><a
+id="x4-21005r5"></a></span>&#x00A0;<br /><span class="label"><a
+id="x4-21006r6"></a></span><span
+class="cmtt-10">//</span><span
+class="cmtt-10">start</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">loading</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">the</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">tile</span><span
+class="cmtt-10">&#x00A0;</span><span
+class="cmtt-10">image</span>&#x00A0;<br /><span class="label"><a
+id="x4-21007r7"></a></span>tile.image.src&#x00A0;=&#x00A0;<span
+class="cmbx-10">this</span>.getTileURL(tile.zoom,&#x00A0;<br /><span class="label"><a
+id="x4-21008r8"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;tile.x,&#x00A0;tile.y);
+</div>
+<br /> <div class="caption"
+><span class="id">Figure&#x00A0;3.2: </span><span
+class="content">Loading of the image data</span></div><!--tex4ht:label?: x4-210092 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 397--><p class="indent" >   The ClipStack, as described in section&#x00A0;<a
+href="webgl-earthch2.html#x3-140002.2.2">2.2.2<!--tex4ht:ref: subsec:ClipStack --></a>, is implemented in relevant classes in
+the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">we.scene</span></span></span> namespace. The <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">ClipStack</span></span></span> class creates and controls individual
+<span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">ClipLevel</span></span></span> class instances &#8211; it manages their offsets and distributes instances of the
+<span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">ClipBuffer</span></span></span>. Each ClipLevel is also periodically prompted to request the tiles it
+needs from appropriate TileCache to &#8220;fill&#8221; itself.
+</p><!--l. 399--><p class="indent" >   All the &#8220;low-level&#8221; operations are encapsulated in the aforementioned classes so
+that the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">Earth</span></span></span> class only needs to move the center of the ClipStack to correspond
+with the camera movement.
+</p><!--l. 401--><p class="indent" >   In the current WebGL Earth implementation, no more than one tile per frame is
+buffered into the ClipBuffer. It would be optimal to distribute the load of tile
+buffering over several frames either via asynchronous operations or by dividing tiles
+into smaller units. However, we don&#8217;t have any means to achieve this at the
+moment.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.4   </span> <a
+id="x4-220003.4"></a>Segmented Plane</h3>
+<!--l. 405--><p class="noindent" >In order to visualize the Earth, we also need properly optimized geometry onto which
+to map the texture data. As previously stated, we need polygon edges to be aligned
+with tile edges. It would be impossible to create and store a triangle mesh that would
+cover the whole Earth at once.
+</p><!--l. 407--><p class="indent" >   We observed, that using a top-down oriented camera, the amount of visible tiles is
+practically constant and even with a free-look camera (adjustable tilt, heading, etc.),
+the number of visible tiles does not increase nearly as fast as the number of existing
+tiles (<span
+class="cmmi-10">O</span>(2<sup><span
+class="cmmi-7">n</span></sup><sup><span
+class="cmr-7">2</span></sup>)).
+</p><!--l. 409--><p class="indent" >   Therefore, we developed a specialized structure called the <span
+class="cmti-10">Segmented Plane</span>. This
+two-dimensional square grid is designed to represent a constant number of tiles and is
+immutable during application execution.
+</p><!--l. 411--><p class="indent" >   When rendering, the raw Segmented Plane data, which are stored in the graphics
+memory, are projected (in the vertex shader) into three-dimensional space based
+on current zoom level and offset (calculated from the camera position and
+direction) to form a part of the actual globe. Because we project corners of
+tiles to the appropriate positions, we also inherently solve the problem of
+Mercator to sphere mapping, although with inexact linear interpolation
+between vertices. It does not, however, cause any visible problems. Figure&#x00A0;<a
+href="#x4-220133">3.3<!--tex4ht:ref: fig:segplane_shader --></a>
+shows optimized vertex position calculation including Mercator to sphere
+transformation.
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-220133"></a>
+
+<div class="center"
+><!--l. 414--><p class="noindent" >
+</p>
+<!--l. 415-->
+<div class="lstlisting" id="listing-2"><span class="label"><a
+id="x4-22001r1"></a></span><span
+class="cmti-10">//</span><span
+class="cmti-10">&#x00A0;</span><span
+class="cmti-10">real</span><span
+class="cmti-10">&#x00A0;</span><span
+class="cmti-10">world</span><span
+class="cmti-10">&#x00A0;</span><span
+class="cmti-10">coordinates</span>&#x00A0;<br /><span class="label"><a
+id="x4-22002r2"></a></span>vec2&#x00A0;phi&#x00A0;=&#x00A0;PI2<span
+class="cmsy-10">*</span>(aVertexPosition+uOffset)/uTileCount;&#x00A0;<br /><span class="label"><a
+id="x4-22003r3"></a></span>&#x00A0;<br /><span class="label"><a
+id="x4-22004r4"></a></span>...&#x00A0;<br /><span class="label"><a
+id="x4-22005r5"></a></span>&#x00A0;<br /><span class="label"><a
+id="x4-22006r6"></a></span><span
+class="cmti-10">//</span><span
+class="cmti-10">bend</span><span
+class="cmti-10">&#x00A0;</span><span
+class="cmti-10">the</span><span
+class="cmti-10">&#x00A0;</span><span
+class="cmti-10">segplane</span>&#x00A0;<br /><span class="label"><a
+id="x4-22007r7"></a></span><span
+class="cmbx-10">float</span>&#x00A0;exp_2y&#x00A0;=&#x00A0;exp(2.0<span
+class="cmsy-10">*</span>phi.y);&#x00A0;<br /><span class="label"><a
+id="x4-22008r8"></a></span><span
+class="cmbx-10">float</span>&#x00A0;tanh&#x00A0;=&#x00A0;((exp_2y<span
+class="cmsy-10">-</span>1.0)/(exp_2y+1.0));&#x00A0;<br /><span class="label"><a
+id="x4-22009r9"></a></span><span
+class="cmbx-10">float</span>&#x00A0;cosy&#x00A0;=&#x00A0;sqrt(1.0<span
+class="cmsy-10">-</span>tanh<span
+class="cmsy-10">*</span>tanh);&#x00A0;<br /><span class="label"><a
+id="x4-22010r10"></a></span>vec3&#x00A0;pos&#x00A0;=&#x00A0;vec3(sin(phi.x)<span
+class="cmsy-10">*</span>cosy,&#x00A0;tanh,&#x00A0;<br /><span class="label"><a
+id="x4-22011r11"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;cos(phi.x)<span
+class="cmsy-10">*</span>cosy);&#x00A0;<br /><span class="label"><a
+id="x4-22012r12"></a></span>gl_Position&#x00A0;=&#x00A0;uMVPMatrix<span
+class="cmsy-10">*</span>vec4(pos,&#x00A0;1.0);
+</div>
+<br /> <div class="caption"
+><span class="id">Figure&#x00A0;3.3: </span><span
+class="content">Vertex position calculation extracted form the vertex shader</span></div><!--tex4ht:label?: x4-220133 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 434--><p class="indent" >   If we used only four vertices and two triangles for every tile, the Earth
+would look very &#8220;angular&#8221; at lower zoom levels. This can be easily solved by
+introducing additional geometry subdivision. Current WebGL Earth uses several
+<span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">SegmentedPlane</span></span></span> instances with different dimensions and subdivision levels. The
+adequate instance is then chosen every frame based on the current zoom
+level.
+</p><!--l. 436--><p class="indent" >   After proper constant adjustments and fine-tuning, the Segmented Plane proved
+to be an efficient way to manage the geometry without having to update the vertex
+buffers at all.
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-220144"></a>
+
+<div class="center"
+><!--l. 438--><p class="noindent" >
+</p><!--l. 438--><p class="noindent" ><img
+src="webgl-earth9x.png" alt="PIC" class="graphics" width="625.96062pt" height="292.89023pt"  /><!--tex4ht:graphics
+name="webgl-earth9x.png" src="gfx/segplane.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;3.4: </span><span
+class="content">Progressively subdivided Segmented Plane</span></div><!--tex4ht:label?: x4-220144 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 440--><p class="indent" >   After we implemented the free-look camera (section&#x00A0;<a
+href="#x4-240003.6">3.6<!--tex4ht:ref: sec:camera --></a>) and 3D terrain
+(section&#x00A0;<a
+href="#x4-230003.5">3.5<!--tex4ht:ref: sec:terrain --></a>), additional refactoring and improvements to the Segmented Plane had
+to be made. Most notable is the introduction of progressive geometry subdivision
+(figure&#x00A0;<a
+href="#x4-220003.4">3.4<!--tex4ht:ref: fig:segplane --></a>), inspired by [<a
+href="webgl-earthli1.html#X0-Boer-2000-GM">Boe00</a>], that allows us to widen the covered area
+(substantial for the free-look camera) while keeping enough geometry detail in the
+important area (necessary for good-looking terrain).
+</p><!--l. 442--><p class="indent" >   When two neighboring geometry tiles have different level-of-detail, visible
+geometry gaps could occur. This is explained in detail by Boer [<a
+href="webgl-earthli1.html#X0-Boer-2000-GM">Boe00</a>]. Figure&#x00A0;<a
+href="#x4-220003.4">3.4<!--tex4ht:ref: fig:segplane --></a>
+displays that we solved this problem by introducing extra <span
+class="cmti-10">transitional triangles </span>at the
+<span
+class="cmti-10">T-junctions</span>.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.5   </span> <a
+id="x4-230003.5"></a>3D terrain</h3>
+<!--l. 446--><p class="noindent" >One of the most intuitive utilizations of the three-dimensional view is the ability to
+display elevation data. The terrain visualization currently implemented in WebGL
+Earth is based on a regular heightmap approach similarly to [<a
+href="webgl-earthli1.html#X0-Asirvatham-2005-TRCM">AH05</a>] and [<a
+href="webgl-earthli1.html#X0-Losasso-2004-GCT">LH04</a>]. We
+have a dedicated <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">ClipStack</span></span></span> for heightmap data alongside one for regular texture
+data. We don&#8217;t need a 256 <span
+class="cmsy-10">&#x00D7; </span>256<span style="margin-left:0.3em" class="thinspace"></span>px heightmap for each tile, so we automatically
+request tiles several levels less detailed than the texture data. This allows the
+ClipStack to be smaller, contain less active ClipLevels, and thus require less system
+resources.
+</p><!--l. 448--><p class="indent" >   The integration of elevation data is executed in the vertex shader, where the
+needed texel is sampled from the appropriate ClipLevel, raw elevation is calculated,
+and the position of the vertex is properly altered.
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-230015"></a>
+
+<div class="center"
+><!--l. 450--><p class="noindent" >
+</p><!--l. 450--><p class="noindent" ><img
+src="webgl-earth10x.jpg" alt="PIC" class="graphics" width="625.96062pt" height="308.84924pt"  /><!--tex4ht:graphics
+name="webgl-earth10x.jpg" src="gfx/terrain.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;3.5: </span><span
+class="content">Experimental 3D terrain <span
+class="cmti-10">(Gurtnellen, Switzerland)</span></span></div><!--tex4ht:label?: x4-230015 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 452--><p class="indent" >   For the terrain to work properly, the graphics card and the driver have to support
+<span
+class="cmti-10">Vertex Texture Fetch </span>(VTF). Some web browsers (Google Chrome and Mozilla
+Firefox 4) use ANGLE (<span
+class="cmti-10">Almost Native Graphics Layer Engine</span>) project for WebGL to
+Direct3D mapping on Microsoft Windows platform, because a large number of users
+does not have proper OpenGL drivers installed. [<a
+href="webgl-earthli1.html#X0-Chr-2010-AP">Bri10</a>] VTF support for the
+ANGLE project is currently under development and will be available soon.
+[<a
+href="webgl-earthli1.html#X0-AP-2011-VTF">Tra11</a>]
+</p><!--l. 454--><p class="indent" >   For debugging purposes Chrome can be configured to use native desktop OpenGL
+instead of the ANGLE library by launching <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">chrome.exe</span></span></span> with <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">--use-gl=desktop</span></span></span>
+command line argument. The same can be achieved in Firefox 4 by setting
+<span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">webgl.prefer-native-gl</span></span></span> (or <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">webgl.prefer_gl</span></span></span> in older versions of the browser)
+to <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">true</span></span></span> at the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">about:config</span></span></span> metapage. This allows us to test the terrain
+implementation on most graphics cards even in the web browsers using ANGLE
+project. After VTF support is fully implemented in this library, more and more users
+will be able to see virtual terrain in WebGL Earth.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.6   </span> <a
+id="x4-240003.6"></a>Free-look camera and different behavior models</h3>
+<!--l. 458--><p class="noindent" >To be able to fully utilize the potential of 3D terrain, we simultaneously
+developed the <span
+class="cmti-10">free-look camera </span>that allows user to change the way the globe is
+displayed.
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-240016"></a>
+
+<div class="center"
+><!--l. 460--><p class="noindent" >
+</p><!--l. 460--><p class="noindent" ><img
+src="webgl-earth11x.png" alt="PIC" class="graphics" width="398.33858pt" height="291.57874pt"  /><!--tex4ht:graphics
+name="webgl-earth11x.png" src="gfx/camera.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;3.6: </span><span
+class="content">Visualization of attributes of the free-look camera</span></div><!--tex4ht:label?: x4-240016 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 462--><p class="indent" >   The free-look camera is defined by several parameters (illustrated in figure&#x00A0;<a
+href="#x4-240003.6">3.6<!--tex4ht:ref: fig:camera --></a>)
+that together fully describe it&#8217;s position and orientation.
+</p><!--l. 464--><p class="indent" >   To provide the best-looking, one-to-one pixel mapping, most of the two-dimensional
+online map applications express distance by (usually integral) <span
+class="cmti-10">zoom level </span>rather than
+altitude. To reflect this behavior (especially in API), WebGL Earth also originally
+operated based on the zoom level. Because the Mercator projection is not an
+equal-area projection, the camera was moving closer to the surface when the
+distance from the Equator increased, which was counterintuitive to most of the
+users.
+</p><!--l. 466--><p class="indent" >   To solve this issue, WebGL Earth codebase defines two distinct <span
+class="cmti-10">camera behavior</span>
+<span
+class="cmti-10">models</span>: <span
+class="cmti-10">Fixed zoom </span>(original behavior &#8211; moving the camera does not change zoom
+level, but altitude is adjusted) or <span
+class="cmti-10">Fixed altitude </span>(more intuitive &#8211; altitude does
+not change, but occasional &#8220;zoom jumps&#8221; may be seen). It&#8217;s up to the final
+application which behavior model to choose &#8211; <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">api</span></span></span> currently operates in <span
+class="cmti-10">fixed zoom</span>
+mode while <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">weapp</span></span></span> uses <span
+class="cmti-10">fixed altitude </span>by default, but allows runtime mode
+switching.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.7   </span> <a
+id="x4-250003.7"></a>WebGL Earth JavaScript API</h3>
+<!--l. 469--><p class="noindent" >In order to enable web developers to easily include WebGL Earth virtual globe into
+their own websites, the project also provides a simple JavaScript API (<span
+class="cmti-10">Application</span>
+<span
+class="cmti-10">Programming Interface</span>), which is easy to use without having any knowledge of the
+inner workings of the codebase (figure&#x00A0;<a
+href="#x4-250187">3.7<!--tex4ht:ref: fig:api --></a>).
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x4-250187"></a>
+
+<div class="center"
+><!--l. 472--><p class="noindent" >
+</p>
+<!--l. 473-->
+<div class="lstlisting" id="listing-3"><span class="label"><a
+id="x4-25001r1"></a></span><span
+class="cmmi-10">&#x003C;</span><span
+class="cmbx-10">html</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25002r2"></a></span>&#x00A0;<span
+class="cmmi-10">&#x003C;</span><span
+class="cmbx-10">head</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25003r3"></a></span>&#x00A0;&#x00A0;<span
+class="cmmi-10">&#x003C;</span><span
+class="cmbx-10">script</span>&#x00A0;<span
+class="cmbx-10">src</span>=&#8221;http://www.webglearth.com/api.js&#8221;<span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25004r4"></a></span>&#x00A0;&#x00A0;<span
+class="cmmi-10">&#x003C;</span>/<span
+class="cmbx-10">script</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25005r5"></a></span>&#x00A0;&#x00A0;<span
+class="cmmi-10">&#x003C;</span><span
+class="cmbx-10">script</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25006r6"></a></span>&#x00A0;&#x00A0;&#x00A0;function&#x00A0;initialize()&#x00A0;<span
+class="cmsy-10">{</span>&#x00A0;<br /><span class="label"><a
+id="x4-25007r7"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;var&#x00A0;options&#x00A0;=&#x00A0;<span
+class="cmsy-10">{</span>zoom:&#x00A0;3,&#x00A0;center:&#x00A0;[47.1953,8.5244],&#x00A0;<br /><span class="label"><a
+id="x4-25008r8"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;map:&#x00A0;WebGLEarth.Maps.OSM<span
+class="cmsy-10">}</span>;&#x00A0;<br /><span class="label"><a
+id="x4-25009r9"></a></span>&#x00A0;&#x00A0;&#x00A0;&#x00A0;var&#x00A0;earth&#x00A0;=&#x00A0;new&#x00A0;WebGLEarth(&#8217;earth&#8217;,&#x00A0;options);&#x00A0;<br /><span class="label"><a
+id="x4-25010r10"></a></span>&#x00A0;&#x00A0;&#x00A0;<span
+class="cmsy-10">}</span>&#x00A0;<br /><span class="label"><a
+id="x4-25011r11"></a></span>&#x00A0;&#x00A0;<span
+class="cmmi-10">&#x003C;</span>/<span
+class="cmbx-10">script</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25012r12"></a></span>&#x00A0;<span
+class="cmmi-10">&#x003C;</span>/<span
+class="cmbx-10">head</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25013r13"></a></span>&#x00A0;<span
+class="cmmi-10">&#x003C;</span><span
+class="cmbx-10">body</span>&#x00A0;<span
+class="cmbx-10">onload</span>=&#8221;initialize()&#8221;<span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25014r14"></a></span>&#x00A0;&#x00A0;<span
+class="cmmi-10">&#x003C;</span><span
+class="cmbx-10">div</span>&#x00A0;<span
+class="cmbx-10">id</span>=&#8221;earth&#8221;&#x00A0;<span
+class="cmbx-10">style</span>=&#8221;width:600px;height:400px&#8221;<span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25015r15"></a></span>&#x00A0;&#x00A0;<span
+class="cmmi-10">&#x003C;</span>/<span
+class="cmbx-10">div</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25016r16"></a></span>&#x00A0;<span
+class="cmmi-10">&#x003C;</span>/<span
+class="cmbx-10">body</span><span
+class="cmmi-10">&#x003E;</span>&#x00A0;<br /><span class="label"><a
+id="x4-25017r17"></a></span><span
+class="cmmi-10">&#x003C;</span>/<span
+class="cmbx-10">html</span><span
+class="cmmi-10">&#x003E;</span>
+</div>
+<br /> <div class="caption"
+><span class="id">Figure&#x00A0;3.7: </span><span
+class="content">Example of simple &#8220;Hello World&#8221; API usage</span></div><!--tex4ht:label?: x4-250187 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 497--><p class="indent" >   It is also currently possible to programmatically display custom datasets and
+dynamically change camera position and zoom. We are planning on adding support
+for marker placement and other features soon.
+</p>
+<h3 class="sectionHead"><span class="titlemark">3.8   </span> <a
+id="x4-260003.8"></a>Contents of the attached CD</h3>
+<!--l. 500--><p class="noindent" >Data on the attached CD are organized into following directory structure:
+</p><ol  class="enumerate1" >
+<li
+class="enumerate" id="x4-26001x3.8"> &#8211; WebGL Earth Git repository snapshot
+</li>
+<li
+class="enumerate" id="x4-26002x3.8"> &#8211; Compiled WebGL Earth application
+</li>
+<li
+class="enumerate" id="x4-26003x3.8"> &#8211; <span class="LATEX">L<span class="A">A</span><span class="TEX">T<span
+class="E">E</span>X</span></span> source files of this document
+</li>
+<li
+class="enumerate" id="x4-26004x3.8"> &#8211; This document in electronic form</li></ol>
+<!--l. 510--><p class="indent" >   In order to compile WebGL Earth or use the codebase for you own application,
+these are the steps you should follow to setup the development environment:
+</p><ol  class="enumerate1" >
+<li
+class="enumerate" id="x4-26005x3.8">                                                       <span
+class="cmti-10">Python</span>
+<span
+class="cmti-10">Interpreter</span><span class="footnote-mark"><a
+href="#fn1x3"><sup class="textsuperscript">1</sup></a></span><a
+id="x4-26006f1"></a>
+and                                       <span
+class="cmti-10">Java                                  Virtual</span>
+<span
+class="cmti-10">Machine</span><span class="footnote-mark"><a
+href="#fn2x3" id="fn2x3-bk"><sup class="textsuperscript">2</sup></a></span><a
+id="x4-26007f2"></a>
+are  required  to  successfully  compile  the  code  using  Closure  Tools
+applications.
+</li>
+<li
+class="enumerate" id="x4-26008x3.8">    Download      the      source      code      from      our      GitHub
+repository<span class="footnote-mark"><a
+href="#fn3x3" id="fn3x3-bk"><sup class="textsuperscript">3</sup></a></span><a
+id="x4-26009f3"></a>
+or use the files provided on the CD.
+</li>
+<li
+class="enumerate" id="x4-26010x3.8"> Under Linux &amp; Mac: just run <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">make</span></span></span> in the project directory.
+</li>
+<li
+class="enumerate" id="x4-26011x3.8">      Under         Windows:         download         latest         <span
+class="cmti-10">Closure</span>
+<span
+class="cmti-10">Library</span><span class="footnote-mark"><a
+href="#fn4x3" id="fn4x3-bk"><sup class="textsuperscript">4</sup></a></span><a
+id="x4-26012f4"></a>
+and                       unpack                       the                       <span
+class="cmti-10">Closure</span>
+<span
+class="cmti-10">Compiler</span><span class="footnote-mark"><a
+href="#fn5x3" id="fn5x3-bk"><sup class="textsuperscript">5</sup></a></span><a
+id="x4-26013f5"></a>
+into the project directory. Now you are ready to run <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">build_app.bat</span></span></span> to
+build WebGL Earth <span
+class="cmti-10">Application </span>or <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">build_api.bat</span></span></span> to build WebGL Earth
+<span
+class="cmti-10">JavaScript API</span>.</li></ol>
+
+<!--l. 518--><p class="indent" >   Elaboration of this thesis included writing most of the source code with exception
+of original inertial animation in <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">SceneDragger</span></span></span> and API examples (contributed by
+Petr P&#x0159;idal), <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">PanControl</span></span></span> and <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">ZoomSlider</span></span></span> UI elements (by Leonardo Salom) and the
+Makefile (Tom Payne). Details of authorship can be observed in the repository
+log.
+
+</p>
+<div class="footnotes"><!--l. 365--><p class="indent" >    <span class="footnote-mark"><a
+href="#fn1x3-bk" id="fn1x3"><sup class="textsuperscript">1</sup></a></span><a
+href="http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml" class="url" ><span
+class="cmtt-8">http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml</span></a></p>
+<!--l. 512--><p class="noindent" ><span class="footnote-mark"><a
+href="#fn1x3-bk"><sup class="textsuperscript">1</sup></a></span><a
+href="http://www.python.org/download/" class="url" ><span
+class="cmtt-8">http://www.python.org/download/</span></a></p>
+<!--l. 512--><p class="noindent" ><span class="footnote-mark"><a
+href="#fn2x3-bk" id="fn2x3"><sup class="textsuperscript">2</sup></a></span><a
+href="http://www.java.com/en/download/" class="url" ><span
+class="cmtt-8">http://www.java.com/en/download/</span></a></p>
+<!--l. 513--><p class="noindent" ><span class="footnote-mark"><a
+href="#fn3x3-bk" id="fn3x3"><sup class="textsuperscript">3</sup></a></span><a
+href="https://github.com/webglearth/webglearth" class="url" ><span
+class="cmtt-8">https://github.com/webglearth/webglearth</span></a></p>
+<!--l. 515--><p class="noindent" ><span class="footnote-mark"><a
+href="#fn4x3-bk" id="fn4x3"><sup class="textsuperscript">4</sup></a></span><a
+href="http://code.google.com/closure/library/docs/gettingstarted.html" class="url" ><span
+class="cmtt-8">http://code.google.com/closure/library/docs/gettingstarted.html</span></a></p>
+<!--l. 515--><p class="noindent" ><span class="footnote-mark"><a
+href="#fn5x3-bk" id="fn5x3"><sup class="textsuperscript">5</sup></a></span><a
+href="http://closure-compiler.googlecode.com/files/compiler-latest.zip" class="url" ><span
+class="cmtt-8">http://closure-compiler.googlecode.com/files/compiler-latest.zip</span></a></p>             </div>
+<!--l. 520--><div class="crosslinks"><p class="noindent">[<a
+href="webgl-earthch4.html" >next</a>] [<a
+href="webgl-earthch2.html" >prev</a>] [<a
+href="webgl-earthch2.html#tailwebgl-earthch2.html" >prev-tail</a>] [<a
+href="webgl-earthch3.html" >front</a>] [<a
+href="index.html#webgl-earthch3.html" >up</a>] </p></div>
+<!--l. 520--><p class="indent" >   <a
+id="tailwebgl-earthch3.html"></a>  </p>
+</body></html>

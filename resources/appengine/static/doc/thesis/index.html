@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+><head><title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" />
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" />
+<!-- xhtml,2,fn-in,html -->
+<meta name="src" content="webgl-earth.tex" />
+<meta name="date" content="2011-09-13 15:42:00" />
+<link rel="stylesheet" type="text/css" href="webgl-earth.css" />
+</head><body
+><h2 class="chapterHead"><span class="titlemark">WebGL Earth</span><br /><a
+id="x2-10001"></a>Content</h2>
+<p class="noindent" >This bachelor thesis describes design and implementation of a new three-dimensional
+virtual globe that works in the web browsers without the need to install any plug-in,
+addon, or extension. Implementation itself is realized in JavaScript language with
+WebGL (<span
+class="cmti-10">Web-based Graphics Library</span>) extension that is available in most of the
+modern web browsers (Mozilla Firefox 4, Google Chrome 10, latest Safari, or Opera
+11.50).
+</p><!--l. 131--><p class="indent" >   The key part of the implementation is appropriate texture management and
+rendering method. This thesis analyzes existing solutions, evaluates their usability in
+the specified environment, and proposes new, better suitable structures and
+algorithms.
+</p><!--l. 133--><p class="indent" >   Results of this thesis were released by <span
+class="cmti-10">Klokan Technologies GmbH </span>as an
+open-source project called <span
+class="cmti-10">WebGL Earth </span>that already has contributors from both
+academical (<span
+class="cmti-10">Universitat Polit</span><span
+class="cmti-10">ècnica de Val</span><span
+class="cmti-10">ència</span>, Spain) and commercial areas
+(<span
+class="cmti-10">CampToCamp S.A.</span>, France/Switzerland).
+
+</p>
+<hr />
+
+<div class="tableofcontents">
+<span class="chapterToc" >1 <a
+href="webgl-earthch1.html#x2-10001" id="QQ2-2-1">Introduction</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.1 <a
+href="webgl-earthch1.html#x2-20001.1" id="QQ2-2-2">Existing virtual globes</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.2 <a
+href="webgl-earthch1.html#x2-30001.2" id="QQ2-2-3">HTML5 and canvas element</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.3 <a
+href="webgl-earthch1.html#x2-60001.3" id="QQ2-2-6">Graphics pipeline description</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.4 <a
+href="webgl-earthch1.html#x2-70001.4" id="QQ2-2-8">Mercator projection</a></span>
+<br />   <span class="chapterToc" >2 <a
+href="webgl-earthch2.html#x3-80002" id="QQ2-3-11">Real-time texturing methods</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2.1 <a
+href="webgl-earthch2.html#x3-90002.1" id="QQ2-3-12">Existing solutions</a></span>
+<br />   &#x00A0;<span class="sectionToc" >2.2 <a
+href="webgl-earthch2.html#x3-120002.2" id="QQ2-3-17">Our solutions</a></span>
+<br />   <span class="chapterToc" >3 <a
+href="webgl-earthch3.html#x4-150003" id="QQ2-4-23">Implementation</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.1 <a
+href="webgl-earthch3.html#x4-160003.1" id="QQ2-4-24">Closure Tools</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.2 <a
+href="webgl-earthch3.html#x4-200003.2" id="QQ2-4-28">Project overview</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.3 <a
+href="webgl-earthch3.html#x4-210003.3" id="QQ2-4-30">Tile management</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.4 <a
+href="webgl-earthch3.html#x4-220003.4" id="QQ2-4-32">Segmented Plane</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.5 <a
+href="webgl-earthch3.html#x4-230003.5" id="QQ2-4-35">3D terrain</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.6 <a
+href="webgl-earthch3.html#x4-240003.6" id="QQ2-4-37">Free-look camera and different behavior models</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.7 <a
+href="webgl-earthch3.html#x4-250003.7" id="QQ2-4-39">WebGL Earth JavaScript API</a></span>
+<br />   &#x00A0;<span class="sectionToc" >3.8 <a
+href="webgl-earthch3.html#x4-260003.8" id="QQ2-4-41">Contents of the attached CD</a></span>
+<br />   <span class="chapterToc" >4 <a
+href="webgl-earthch4.html#x5-270004" id="QQ2-5-42">Conclusion</a></span>
+<br />   &#x00A0;<span class="sectionToc" >4.1 <a
+href="webgl-earthch4.html#x5-280004.1" id="QQ2-5-44">Future of the project</a></span>
+<br />   <span class="likechapterToc" ><a
+href="webgl-earthli1.html#x6-290004.1" id="QQ2-6-45">Bibliography</a></span>
+</div>
+
+<hr />
+
+</body></html>
+

@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+>
+<head><title>2 Real-time texturing methods</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" />
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)" />
+<!-- xhtml,2,fn-in,html -->
+<meta name="src" content="webgl-earth.tex" />
+<meta name="date" content="2011-09-13 15:42:00" />
+<link rel="stylesheet" type="text/css" href="webgl-earth.css" />
+</head><body
+><!--l. 227--><div class="crosslinks"><p class="noindent">[<a
+href="webgl-earthch3.html" >next</a>] [<a
+href="webgl-earthch1.html" >prev</a>] [<a
+href="webgl-earthch1.html#tailwebgl-earthch1.html" >prev-tail</a>] [<a
+href="#tailwebgl-earthch2.html">tail</a>] [<a
+href="index.html#webgl-earthch2.html" >up</a>] </p></div>
+<h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;2</span><br /><a
+id="x3-80002"></a>Real-time texturing methods</h2>
+<!--l. 229--><p class="noindent" >The goal of WebGL Earth is to display a virtual globe and to be able to zoom down
+to street-level. We need to be able to display maps with up to 23 zoom levels &#8212;
+2<sup><span
+class="cmr-7">23</span></sup> <span
+class="cmsy-10">&#x00D7; </span>2<sup><span
+class="cmr-7">23</span></sup> tiles at the most detailed zoom level. With tiles being 256<span style="margin-left:0.3em" class="thinspace"></span>px <span
+class="cmsy-10">&#x00D7; </span>256<span style="margin-left:0.3em" class="thinspace"></span>px
+and having a 32 bit depth, we would have to be able to store more than
+4 exabytes<span class="footnote-mark"><a
+href="#fn1x2" id="fn1x2-bk"><sup class="textsuperscript">1</sup></a></span><a
+id="x3-8001f1"></a>
+of data directly in video memory. That is impossible on today&#8217;s mainstream
+hardware, which usually has 512 megabytes or 1 gigabyte of video memory.
+</p><!--l. 231--><p class="indent" >   Therefore, we had to implement some form of tile management system, that
+would take care of dynamic tile streaming, caching, and real-time lookup in a GLSL
+shader program during rendering.
+</p>
+<h3 class="sectionHead"><span class="titlemark">2.1   </span> <a
+id="x3-90002.1"></a>Existing solutions</h3>
+<!--l. 234--><p class="noindent" >There are several existing solutions, but WebGL Earth is targeted to run on
+mainstream or even low-end hardware such as laptops, tablets or mobile
+phones.
+</p><!--l. 236--><p class="indent" >   Nearly the whole project has to be implemented in JavaScript (which has poor
+performance compared to compiled languages such as C++). However, WebGL
+enables us to perform low-level, high-performance operations in shaders, that are
+compiled and run directly on the graphics card. We should try to move as much
+calculations as possible from CPU to GPU in order to maximize performance,
+although too complex or excessively diverging shaders would become the bottleneck
+of the whole application.
+</p><!--l. 238--><p class="indent" >   In order to further optimize performance, we should move as much calculations as
+possible from the fragment shader to the vertex shader (as we already suggested in
+section&#x00A0;<a
+href="webgl-earthch1.html#x2-60001.3">1.3<!--tex4ht:ref: sec:pipeline --></a>). To be able to do this, we have to subdivide the geometry so that
+the edges of polygons are aligned with the edges of tiles (more details in
+section&#x00A0;<a
+href="webgl-earthch3.html#x4-220003.4">3.4<!--tex4ht:ref: sec:segplane --></a>).
+</p><!--l. 240--><p class="noindent" >
+</p>
+<h4 class="subsectionHead"><span class="titlemark">2.1.1   </span> <a
+id="x3-100002.1.1"></a>Virtual Texturing</h4>
+<!--l. 242--><p class="noindent" ><span
+class="cmti-10">Virtual Textures </span>(as described by Mittring [<a
+href="webgl-earthli1.html#X0-Mittring-2008-AVT">MG08</a>]) is a method of large texture
+management that, as its name indicates, adopts the fundamental ideas of memory
+virtualization from computer operating systems.
+</p><!--l. 244--><p class="indent" >   In 2005, <span
+class="cmti-10">id Software </span>announced a new technology called <span
+class="cmti-10">MegaTextures</span>, but the
+implementation details were unknown. In 2009, it was confirmed, that a newer,
+revised version of the technology called &#8220;MegaTextures v2&#8221; is essentially virtual
+texturing. [<a
+href="webgl-earthli1.html#X0-Waveren-2009-TV">Wav09</a>, pp. 3&#8211;21] [<a
+href="webgl-earthli1.html#X0-Mayer-2010-VT">May10</a>, p. 14]
+</p><!--l. 246--><p class="indent" >   In implementations of virtual texturing, the whole texture is divided into <span
+class="cmti-10">pages</span>
+(we can use <span
+class="cmti-10">tiles </span>directly as pages, because 256 <span
+class="cmsy-10">&#x00D7; </span>256<span style="margin-left:0.3em" class="thinspace"></span>px division provides enough
+
+granularity). There is a large <span
+class="cmti-10">buffer </span>in video memory which serves as a page
+buffer and where the needed tiles are placed. The application also has to
+maintain a <span
+class="cmti-10">page table </span>(or <span
+class="cmti-10">lookup table</span>) that will provide information (in
+constant time) whether the page with given coordinates is available in the
+buffer.
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x3-100011"></a>
+
+<div class="center"
+><!--l. 248--><p class="noindent" >
+</p><!--l. 248--><p class="noindent" ><img
+src="webgl-earth3x.png" alt="PIC" class="graphics" width="512.1496pt" height="276.867pt"  /><!--tex4ht:graphics
+name="webgl-earth3x.png" src="gfx/world_lookup.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;2.1: </span><span
+class="content">Principle of the Page Table</span></div><!--tex4ht:label?: x3-100011 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 250--><p class="indent" >   In order to display a tile that is currently not present in the buffer, we have to
+find a &#8220;slot&#8221; to buffer it into. In case there are no empty slots left, an existing tile has
+to be discarded from the buffer. <span
+class="cmti-10">Least Recently Used </span>(LRU) is the most commonly
+used algorithm for the &#8220;victim selection&#8221;.
+</p><!--l. 252--><p class="indent" >   Virtual texturing implementations also usually employ the so-called <span
+class="cmti-10">feedback</span>
+<span
+class="cmti-10">buffer </span>into which the scene is being rendered with a special shader program applied.
+The feedback buffer is then transfered to RAM and analyzed. It contains
+information about what tiles should optimally be in the buffer at the given
+moment.
+</p><!--l. 254--><p class="indent" >   An implementation of virtual texturing called &#8220;MegaTextures in WebGL&#8221; and its
+description [<a
+href="webgl-earthli1.html#X0-Vanik-2009-MT">Van09</a>] was the initially proposed solution to the texturing problem.
+However, after deeper analysis, we found out it was not suitable for our
+needs.
+</p><!--l. 256--><p class="indent" >   The main disadvantage of virtual texturing is its low scalability &#8212; the space
+complexity of the page table is linear in the number of pages in the whole texture.
+We need to be able to display tiles from zoom levels up to 23. In other words, we
+have 2<sup><span
+class="cmr-7">23</span></sup><sup><span
+class="cmr-7">2</span></sup> tiles on the most detailed level. The necessary page table would be too
+large to be stored in both graphics or operating memory of a mainstream
+computer.
+</p><!--l. 258--><p class="indent" >   With the knowledge, that the needed tiles are usually from relatively small,
+continuous area of the texture (There is no need to display two different parts of the
+world at once), we could maintain a quadtree instead of the page table, which
+would allow us to save a lot of memory. When some larger area of the map is
+not in the buffer, we can mark the whole area mark as unavailable by not
+partitioning the quadtree any further. This would effectively solve the page table
+storage problem, but would require more complex updating, during which
+we would have to potentially create and destroy whole subtrees. The tile
+lookup operations executed in the vertex shader would also become quite
+complex.
+</p><!--l. 260--><p class="indent" >   However, virtual texturing is not suitable for our needs mainly because the only
+way of storing the page table (or the page tree) is in the video memory as
+a simple texture &#8211; it is too much data to be transfered from the regular
+operating memory every time a video frame is rendered. Because we want to
+perform the tile lookup operations per-vertex for performance reasons, we need
+<span
+class="cmti-10">Vertex Texture Fetch </span>support (access to texture buffers from vertex shaders),
+which is not declared mandatory by the GLSL ES 1.0 specification [<a
+href="webgl-earthli1.html#X0-GLSLES-Spec">Khr09</a>,
+p. 113].
+</p>
+<h4 class="subsectionHead"><span class="titlemark">2.1.2   </span> <a
+id="x3-110002.1.2"></a>ClipMapping</h4>
+<!--l. 264--><p class="noindent" >This technique, originally described by C. Tanner [<a
+href="webgl-earthli1.html#X0-Tanner-1998-CM">TMJ98</a>], is based on observations
+about mipmapping. Mip Map, as defined by L. Williams [<a
+href="webgl-earthli1.html#X0-Williams-1983-PP">Wil83</a>], is a series of images
+with increasingly reduced resolution down to 1 <span
+class="cmsy-10">&#x00D7; </span>1<span style="margin-left:0.3em" class="thinspace"></span>px and thus forming a so-called
+
+<span
+class="cmti-10">mipmap pyramid</span>. Modern graphics cards are able to generate the mipmap pyramid
+&#8220;on-the-fly&#8221; during buffering of the texture data. When a geometry with mipmapped
+texture is being rendered, <span
+class="cmti-10">texels </span>(texture elements) from appropriate levels of the
+pyramid are chosen depending on several factors. Most important are camera
+angle from the surface, camera distance, and texture filtering used. This
+effectively reduces number of texels that needs to be read from the video memory
+increasing performance and helping to solve aliasing artifacts at the same
+time.
+</p><!--l. 266--><p class="indent" >   The calculations ensuring appropriate mipmap level selection during rendering are
+designed in such way, that the final texel to pixel mapping ratio is as close to 1:1 as
+possible [<a
+href="webgl-earthli1.html#X0-Avi-2010-GE">Bar07</a>]. We can easily deduce, that from each mipmap level <span
+class="cmti-10">at most </span>as many
+texels as the number of pixels in the viewport where the scene is being rendered are
+needed.
+</p><!--l. 268--><p class="indent" >   If the &#8220;clipmapped&#8221; texture is mapped onto the geometry continuously, we can
+find a certain &#8220;point of interest&#8221; (<span
+class="cmti-10">ClipCenter</span>) which defines what data will be needed
+from each mipmap level in the currently rendered frame (this subset is called the
+<span
+class="cmti-10">ClipLevel</span>). (figure&#x00A0;<a
+href="#x3-110002.1.2">2.1.2<!--tex4ht:ref: fig:clipmap --></a>)
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x3-110012"></a>
+
+<div class="center"
+><!--l. 270--><p class="noindent" >
+</p><!--l. 270--><p class="noindent" ><img
+src="webgl-earth4x.png" alt="PIC" class="graphics" width="398.33858pt" height="214.90236pt"  /><!--tex4ht:graphics
+name="webgl-earth4x.png" src="gfx/clipmap.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;2.2: </span><span
+class="content">Area covered by the ClipMap as a subset of MipMap</span></div><!--tex4ht:label?: x3-110012 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 272--><p class="indent" >   It is very important to update the ClipMap after every ClipCenter change,
+because there is no guarantee, that the whole area is still appropriately covered.
+Usually, the ClipCenter moves just by a fraction of the ClipLevel size. If we set the
+wrapping mode of the textures to <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">gl.REPEAT</span></span></span>, it can be addressed in a &#8220;loop&#8221;
+(so-called <span
+class="cmti-10">toroidal addressing</span>). With this in mind, we can simply overwrite the tiles
+that are no longer needed with the newly needed ones. This way we can prevent
+unnecessary data transfers.
+</p><!--l. 274--><p class="indent" >   There is no built-in support for ClipMaps in mainstream hardware, so we have to
+maintain each ClipLevel as an independent WebGL texture including whole mipmap
+pyramid and ensure the ClipMap consistency ourselves.
+</p><!--l. 276--><p class="indent" >   When rendering ClipMapped geometry, we have to choose the proper ClipLevel
+for each segment. Antonio Seoane et al. [<a
+href="webgl-earthli1.html#X0-STHLJ-2007-HIC">Seo+07</a>] describes two different approaches
+to Hardware-Independent ClipMap rendering:
+</p><ol  class="enumerate1" >
+<li
+class="enumerate" id="x3-11003x1">For each segment of the geometry (each tile) apply the finest available
+texture.
+</li>
+<li
+class="enumerate" id="x3-11005x2">For each ClipLevel, draw all geometry segments that are covered by this
+level but not any finer one.</li></ol>
+<!--l. 281--><p class="noindent" >Both approaches require the geometry to be divided into a large number of small,
+completely independent segments. This would result in a higher CPU load (larger
+data structure overhead, frequent vertex buffer switching), which conflicts with our
+intention to move as much computation from JavaScript to GPU as possible.
+Demands on more complex data structure management on CPU side is the main
+reason why ClipMapping is (in the original variant) unsuitable for WebGL
+Earth.
+</p><!--l. 285--><p class="indent" >   <span
+class="cmti-10">Google Earth </span>uses a patented [<a
+href="webgl-earthli1.html#X0-Tanner-2003-UT">Tan03</a>] method based on ClipMapping called
+&#8220;Universal Texture&#8221;, but it is not optimal for use with tile-based data sets.
+[<a
+href="webgl-earthli1.html#X0-Avi-2010-GE">Bar07</a>]
+</p>
+<h3 class="sectionHead"><span class="titlemark">2.2   </span> <a
+id="x3-120002.2"></a>Our solutions</h3>
+<!--l. 288--><p class="noindent" >JavaScript and WebGL form an environment with specific attributes. The most
+important is the aforementioned performance, but there are also other factors. One of
+them is portability &#8211; the WebGL standard (together with GLSL ES 1.0) is designed
+to be implementable on almost any modern piece of hardware. Due to this, a lot of
+features are marked as <span
+class="cmti-10">not mandatory </span>to be implemented and other operations are
+restricted. <br
+class="newline" /><br
+class="newline" />The most important limitations are:
+
+</p><ol  class="enumerate1" >
+<li
+class="enumerate" id="x3-12001x2.2"> &#8211; some platforms may not be able to provide access to texture samplers
+from <span
+class="cmti-10">vertex </span>shaders. VTF capability can be determined from the special
+constant <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">gl_MaxVertex</span></span></span><span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">TextureImageUnits</span></span></span>, which is available in both
+vertex and fragment shaders. [<a
+href="webgl-earthli1.html#X0-GLSLES-Spec">Khr09</a>, p. 61] We should completely avoid
+using VTF.
+</li>
+<li
+class="enumerate" id="x3-12002x2.2"> &#8211; we have no guarantee that shaders containing <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">while</span></span></span> loops will get
+compiled at all. If we really have to create a loop in shaders, always use
+the <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">for</span></span></span> statement, although it has additional restrictions: The loop index
+has to be one local variable with constant growth and boundaries. The
+index is also not allowed to change inside the body of the loop. [<a
+href="webgl-earthli1.html#X0-GLSLES-Spec">Khr09</a>,
+pp. 108&#8211;109]
+</li>
+<li
+class="enumerate" id="x3-12003x2.2"> &#8211;  It  would  be  sometimes  useful  to  have  access  to  raw  data  from
+framebuffers  via  <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">gl.readPixels</span></span></span> (<span
+class="cmti-10">feedback  buffer  </span>for  virtual  textures)
+or  the  data  from  <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">image</span></span></span> elements  (would  be  useful  for  terrain  height
+determining or dividing tiles into smaller units). However, this is both
+restricted to &#8220;prevent information leakage&#8221; as long as any content from
+different domain than document itself was loaded into appropriate <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">canvas</span></span></span>
+or <span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">image</span></span></span> element. [<a
+href="webgl-earthli1.html#X0-WebGL-Spec">Khr11</a>, section 4.2]</li></ol>
+<!--l. 296--><p class="indent" >   Mainly because of these environment properties, existing solutions of very large
+texture handling and management are not suitable for WebGL Earth. We
+therefore designed new, derived methods that are more adequate for our
+needs.
+</p><!--l. 298--><p class="noindent" >
+</p>
+<h4 class="subsectionHead"><span class="titlemark">2.2.1   </span> <a
+id="x3-130002.2.1"></a>TileBuffer with binary lookup</h4>
+<!--l. 299--><p class="noindent" >The main problem of virtual texturing (section&#x00A0;<a
+href="#x3-100002.1.1">2.1.1<!--tex4ht:ref: subsec:virtualtextures --></a>) is (as we&#8217;ve described before)
+it&#8217;s low scalability. Instead of having an enormous lookup table where most of the
+space is empty, we tried a reverse approach. We introduced <span
+class="cmti-10">metadata </span>that describes
+the content of each &#8220;slot&#8221; of the buffer (in context of this method called the
+<span
+class="cmti-10">TileBuffer</span>).
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x3-130013"></a>
+
+<div class="center"
+><!--l. 302--><p class="noindent" >
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;2.3: </span><span
+class="content">Example of metadata for &#x00A0;8 <span
+class="cmsy-10">&#x00D7; </span>8 TileBuffer</span></div><!--tex4ht:label?: x3-130013 -->
+<div class="tabular"> <table id="TBL-1" class="tabular"
+cellspacing="0" cellpadding="0" rules="groups"
+><colgroup id="TBL-1-1g"><col
+id="TBL-1-1" /></colgroup><colgroup id="TBL-1-2g"><col
+id="TBL-1-2" /></colgroup><colgroup id="TBL-1-3g"><col
+id="TBL-1-3" /></colgroup><tr
+class="hline"><td><hr /></td><td><hr /></td><td><hr /></td></tr><tr
+style="vertical-align:baseline;" id="TBL-1-1-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-1-1"
+class="td11">&#x00A0;Slot ID&#x00A0;</td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-1-2"
+class="td11">&#x00A0;Zoom level&#x00A0;</td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-1-3"
+class="td11">&#x00A0;Tile coordinates&#x00A0;</td>
+</tr><tr
+class="hline"><td><hr /></td><td><hr /></td><td><hr /></td></tr><tr
+class="hline"><td><hr /></td><td><hr /></td><td><hr /></td></tr><tr
+style="vertical-align:baseline;" id="TBL-1-2-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-2-1"
+class="td11">    0      </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-2-2"
+class="td11">     8        </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-2-3"
+class="td11">    [79; 230]       </td>
+</tr><tr
+class="hline"><td><hr /></td><td><hr /></td><td><hr /></td></tr><tr
+style="vertical-align:baseline;" id="TBL-1-3-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-3-1"
+class="td11">    1      </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-3-2"
+class="td11">     -1       </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-3-3"
+class="td11">     empty        </td>
+</tr><tr
+class="hline"><td><hr /></td><td><hr /></td><td><hr /></td></tr><tr
+style="vertical-align:baseline;" id="TBL-1-4-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-4-1"
+class="td11">    2      </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-4-2"
+class="td11">     14       </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-4-3"
+class="td11">   [6396; 2436]    </td>
+</tr><tr
+style="vertical-align:baseline;" id="TBL-1-5-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-5-1"
+class="td11">    <img
+src="webgl-earth5x.png" alt=".
+.."  class="vdots"  />      </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-5-2"
+class="td11">     &#x00A0;        </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-5-3"
+class="td11">       &#x00A0;           </td>
+</tr><tr
+style="vertical-align:baseline;" id="TBL-1-6-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-6-1"
+class="td11">   63     </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-6-2"
+class="td11">     7        </td><td  style="white-space:nowrap; text-align:center;" id="TBL-1-6-3"
+class="td11">     [8; 45]        </td>
+</tr><tr
+class="hline"><td><hr /></td><td><hr /></td><td><hr /></td></tr><tr
+style="vertical-align:baseline;" id="TBL-1-7-"><td  style="white-space:nowrap; text-align:center;" id="TBL-1-7-1"
+class="td11">         </td></tr></table></div></div>
+
+</div><hr class="endfigure" />
+<!--l. 319--><p class="indent" >   The metadata are small enough to be repeatedly sent into the vertex shader as a
+<span class="obeylines-h"><span class="verb"><span
+class="cmtt-10">uniform</span></span></span> array (storage qualifiers are described in section&#x00A0;<a
+href="webgl-earthch1.html#x2-60001.3">1.3<!--tex4ht:ref: sec:pipeline --></a>). By going through the
+metadata, the shader determines in what slot (if any) the needed tile is stored.
+Simply iterating over the array has linear complexity. We can, however, reduce the
+complexity of the tile lookup operation to logarithmic by sorting the metadata by
+zoom level and tile coordinates, then we can perform the more effective <span
+class="cmti-10">binary</span>
+<span
+class="cmti-10">search</span>.
+</p><!--l. 321--><p class="indent" >   Updating the TileBuffer is identical to updating the virtual texture&#8217;s buffer
+(including the LRU structure for the &#8220;victim selection&#8221;). Every time we send a tile
+into the TileBuffer, we also appropriately update the metadata.
+</p><!--l. 323--><p class="indent" >   The most noticeable drawback of this approach, that is actually inherited from
+Virtual Textures, are visible &#8220;artifacts&#8221; on tile edges. This happens because unrelated
+tiles are often stored next to each other in the TileBuffer. If we use linear filtering,
+each resulting pixel is obtained by sampling two nearest texels and performing linear
+interpolation between them. The texture sampling units perform the interpolation
+even on the tile edges. Although the portion of neighboring &#8220;foreign&#8221; texel in the
+final pixel is always less than one half, it can be very visually distracting
+(figure&#x00A0;<a
+href="#x3-130002.2.1">2.2.1<!--tex4ht:ref: fig:tilebuffer_artifacts --></a>).
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x3-130024"></a>
+
+<div class="center"
+><!--l. 325--><p class="noindent" >
+</p><!--l. 325--><p class="noindent" ><img
+src="webgl-earth6x.jpg" alt="PIC" class="graphics" width="569.05511pt" height="364.03111pt"  /><!--tex4ht:graphics
+name="webgl-earth6x.jpg" src="gfx/tilebuffer_artifacts.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;2.4: </span><span
+class="content">Visible artifacts on tile edges</span></div><!--tex4ht:label?: x3-130024 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 327--><p class="indent" >   This issue can be partially solved by performing strict &#8220;clamping&#8221; in the fragment
+shader, but we lose the benefits of linear filtering. Although the absence of filtering
+on the tile edges is not noticeable during texturing, it became a serious problem when
+we used this method for heightmap-based 3D terrain. It caused visible &#8220;jumps&#8221; and
+&#8220;holes&#8221; in the geometry.
+</p><!--l. 329--><p class="indent" >   This method proved to be usable for the problem specified, but the amount of
+instructions executed in the vertex shader increases with TileBuffer size and with
+8 <span
+class="cmsy-10">&#x00D7; </span>8 tiles the rendering already takes too long on low-end devices and on some
+graphics cards the program doesn&#8217;t even link due to forced <span
+class="cmti-10">loop unrolling </span>which
+makes the code too long on some hardware.
+</p>
+<h4 class="subsectionHead"><span class="titlemark">2.2.2   </span> <a
+id="x3-140002.2.2"></a>ClipStack</h4>
+<!--l. 333--><p class="noindent" >ClipMapping (section&#x00A0;<a
+href="#x3-110002.1.2">2.1.2<!--tex4ht:ref: subsec:clipmapping --></a>) proved to be an interesting method of very large texture
+management. By introducing several modifications, improvements and simplifications
+we get a new method, suitable for implementation in JavaScript and WebGL, that we
+call the <span
+class="cmti-10">ClipStack</span>.
+</p><!--l. 335--><p class="indent" >   We previously stated, that the regular ClipMap is too CPU-demanding. ClipStack
+changes this by having all geometry stored in one large immutable vertex buffer
+residing in graphics memory and moving ClipLevel selection to the vertex
+shader.
+</p>
+<hr class="figure" /><div class="figure"
+><a
+id="x3-140015"></a>
+
+<div class="center"
+><!--l. 337--><p class="noindent" >
+</p><!--l. 337--><p class="noindent" ><img
+src="webgl-earth7x.png" alt="PIC" class="graphics" width="426.79134pt" height="214.98085pt"  /><!--tex4ht:graphics
+name="webgl-earth7x.png" src="gfx/clipstack.eps"
+-->
+<br /> </p><div class="caption"
+><span class="id">Figure&#x00A0;2.5: </span><span
+class="content">ClipStack</span></div><!--tex4ht:label?: x3-140015 -->
+</div>
+
+</div><hr class="endfigure" />
+<!--l. 339--><p class="indent" >   A ClipStack is a collection of <span
+class="cmti-10">ClipLevels </span>(figure&#x00A0;<a
+href="#x3-140002.2.2">2.2.2<!--tex4ht:ref: fig:clipstack --></a>). Each ClipLevel represents
+a continuous subset of one level of the tile pyramid and contains additional
+information about the location of this subset inside the whole level (<span
+class="cmti-10">offset</span>) and
+<span
+class="cmti-10">metadata </span>describing which parts of the underlying buffer are valid and which are yet
+to be filled with the data from the tile server.
+</p><!--l. 341--><p class="indent" >   When rendering geometry textured with the ClipStack we send the metadata and
+offsets to the shader program. The Vertex shader calculates the coordinates of the
+optimal tile to map onto the vertex. If this tile is not available in the appropriate
+ClipLevel, which is determined by simply looking into the metadata, the shader looks
+for the <span
+class="cmti-10">fallback tile</span>.
+</p><!--l. 343--><p class="indent" >   Although having the same size, each ClipLevel covers twice as large an area as the
+previous one. It would be an unnecessary waste of computational power to fall back
+too many times &#8211; the shader would get too complex, too much data would have to be
+streamed, and individual executions would potentially diverge too much. We limit
+the number of <span
+class="cmti-10">active </span>ClipLevels that are actually used during single frame
+rendering to a constant value. We use 3 active ClipLevels with the resolution
+of 2048 <span
+class="cmsy-10">&#x00D7; </span>2048<span style="margin-left:0.3em" class="thinspace"></span>px (8 <span
+class="cmsy-10">&#x00D7; </span>8<span style="margin-left:0.3em" class="thinspace"></span>tiles, 256 <span
+class="cmsy-10">&#x00D7; </span>256<span style="margin-left:0.3em" class="thinspace"></span>px each) in our implementation. It
+proved to be enough to cover a very large area making it really hard to
+see &#8220;uncovered&#8221; geometry even inside viewports with a resolution close to
+1920 <span
+class="cmsy-10">&#x00D7; </span>1080<span style="margin-left:0.3em" class="thinspace"></span>px.
+</p><!--l. 345--><p class="indent" >   We can also reduce the memory usage by creating a limited number of <span
+class="cmti-10">ClipBuffers</span>
+(greater than or equal to the number of active ClipLevels) and &#8220;sliding&#8221; them so that
+the active levels are always assigned a buffer.
+</p><!--l. 347--><p class="indent" >   In some situations, the appropriate data may be missing in all active ClipLevels.
+In such cases, we don&#8217;t want the geometry to be transparent or single-colored. We
+define the <span
+class="cmti-10">ClipLevelN</span>, which is a special, reduced (without metadata or offset
+information) level that covers the whole planet and serves as the &#8220;ultimate
+fallback&#8221;.
+
+</p>
+<div class="footnotes"><!--l. 229--><p class="indent" >    <span class="footnote-mark"><a
+href="#fn1x2-bk" id="fn1x2"><sup class="textsuperscript">1</sup></a></span><span
+class="cmr-8">2</span><sup><span
+class="cmr-6">23</span></sup><sup><span
+class="cmr-6">2</span></sup> <span
+class="cmsy-8">&#x00D7; </span><span
+class="cmr-8">256</span><sup><span
+class="cmr-6">2</span></sup> <span
+class="cmsy-8">&#x00D7; </span><span
+class="cmr-8">4</span><span style="margin-left:0.3em" class="thinspace"></span><span
+class="cmr-8">B = 16 </span><span
+class="cmsy-8">&#x00D7; </span><span
+class="cmr-8">2</span><sup><span
+class="cmr-6">60</span></sup><span style="margin-left:0.3em" class="thinspace"></span><span
+class="cmr-8">B</span></p>                                                                       </div>
+<!--l. 349--><div class="crosslinks"><p class="noindent">[<a
+href="webgl-earthch3.html" >next</a>] [<a
+href="webgl-earthch1.html" >prev</a>] [<a
+href="webgl-earthch1.html#tailwebgl-earthch1.html" >prev-tail</a>] [<a
+href="webgl-earthch2.html" >front</a>] [<a
+href="index.html#webgl-earthch2.html" >up</a>] </p></div>
+<!--l. 349--><p class="indent" >   <a
+id="tailwebgl-earthch2.html"></a>   </p>
+</body></html>
