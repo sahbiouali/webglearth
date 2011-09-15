@@ -30,8 +30,8 @@
 </style>
 <script>
   function initialize() {
-    var earth = new WebGLEarth('earth_div', { zoom: 2, proxyHost: 'http://srtm.webglearth.com/cgi-bin/corsproxy.fcgi?url=' });
-    var customTMS = earth.initMap(WebGLEarth.Maps.CUSTOM, ['TMS','http://webglearth.googlecode.com/svn/resources/tms/{z}/{x}/{y}.jpg',1,5,256,true]);
+    var earth = new WebGLEarth('earth_div', { zoom: 2, proxyHost: 'http://data.webglearth.com/cgi-bin/corsproxy.fcgi?url=' });
+    var customTMS = earth.initMap(WebGLEarth.Maps.CUSTOM, ['TMS','http://data.webglearth.com/natural-earth-color/{z}/{x}/{y}.jpg',1,5,256,true]);
     // name, url, minZoom, maxZoom, tileSize, flip-y-axis
     earth.setBaseMap(customTMS);
   }
