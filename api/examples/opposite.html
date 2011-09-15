@@ -39,7 +39,7 @@
   }
 
   function initialize() {
-    var proxyUrl = 'http://srtm.webglearth.com/cgi-bin/corsproxy.fcgi?url=';
+    var proxyUrl = 'http://data.webglearth.com/cgi-bin/corsproxy.fcgi?url=';
     earth1 = new WebGLEarth( 'earth_div1', { zoom:zoom, position:pos, proxyHost:proxyUrl } );
     earth2 = new WebGLEarth( 'earth_div2', { zoom:zoom, position:antipode(pos), proxyHost:proxyUrl } );
     
