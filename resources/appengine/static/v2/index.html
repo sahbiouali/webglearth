@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="robots" content="index, all" />
+  <title>WebGL Earth</title>
+
+  <link rel="stylesheet" type="text/css" href="index.css" />
+  <script src="index.js"></script>
+  
+ </head>
+ <body onload="javascript:new WebGLEarth();">
+   <a href="http://www.webglearth.com/" id="logo">Web<span id="gl">GL</span>Earth</a>
+   <form><input type="search" name="geocoder" id="geocoder" label="Find a place..." placeholder="Find a place..." /></form>
+   <select id="maptype">
+     <option value="bing_aerialwl">Bing Maps – Aerial with labels</option>
+     <option value="bing_roads">Bing Maps – Roads</option>
+     <option value="bing_aerial">Bing Maps – Aerial</option>
+     <option value="mapquest">MapQuest OSM</option>
+     <option value="osm">OpenStreetMap</option>
+   </select>
+   <div id="webglearthdiv"></div>
+   <a href="http://www.klokantech.com/" id="klokan"></a>
+ </body>
+</html>
